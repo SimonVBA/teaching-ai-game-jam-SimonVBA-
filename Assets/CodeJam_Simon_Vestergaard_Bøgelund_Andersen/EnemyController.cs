@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class EnemyController : StateMachine<EnemyController>, IMoveControl
 {
     [SerializeField] private float _maxSpeed = 25f;
@@ -11,17 +12,16 @@ public class EnemyController : StateMachine<EnemyController>, IMoveControl
         set => _maxSpeed = value;
     }//Property 
     public Rigidbody2D playerRigidbody{get; set;}
+    public SpriteRenderer spriteRenderer{get; set;}
     
     //event Action<Vector2> MoveEvent;
     private void Start()
     {
         playerRigidbody = GetComponent<Rigidbody2D>();
-        Debug.Log("Awake");
+        spriteRenderer = GetComponent<SpriteRenderer>();
         var moveState = new MoveState<EnemyController>(this);
-        Debug.Log("moveState Type: "+moveState.GetType());
         states.Add(moveState.GetType(),moveState);
         var wobblemoveState = new WobbleMoveState<EnemyController>(this);
-        Debug.Log("wobblemoveState Type: "+wobblemoveState.GetType());
         states.Add(wobblemoveState.GetType(),wobblemoveState);
         
         System.Random random = new System.Random();

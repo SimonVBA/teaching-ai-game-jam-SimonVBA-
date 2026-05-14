@@ -18,10 +18,11 @@ public interface IMoveControl
     float maxSpeed {get; set;} // in m/s
     Rigidbody2D playerRigidbody{get; set;}
     Vector2 getTrackedPosition();
+    SpriteRenderer spriteRenderer{get; set;}
 }
 
 [Serializable]
-public abstract partial class State<T> //partial??
+public abstract partial class State<T>
 {
     [Serialize] protected T context;
     public State(T currentContext)

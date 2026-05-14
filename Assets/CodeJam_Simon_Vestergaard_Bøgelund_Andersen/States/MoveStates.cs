@@ -11,7 +11,6 @@ public class MoveState<T>: State<T> where T: MonoBehaviour, IMoveControl//, ISta
     public MoveState(T currentContext): base(currentContext){}
     public override void EnterState()
     {
-        Debug.Log("Enter State of "+ this.GetType());
         moveRoutine = context.StartCoroutine(Move());
     }
 
@@ -19,21 +18,16 @@ public class MoveState<T>: State<T> where T: MonoBehaviour, IMoveControl//, ISta
     {
         while (true)
         {
-            Debug.Log("Move in MoveState :"+ this.GetType());
-            //context.MoveEvent?.Invoke(_getForce(_getTrackedPosition()).normalized);
             Vector2 direction = TargetDistanceVector().normalized;
             context.playerRigidbody.AddForce(direction* context.maxSpeed);
-            float xScale = direction.x < 0 ? -1 : 1;
-            context.transform.localScale = new Vector3(xScale, 1, 1);
+            context.spriteRenderer.flipX = direction.x > 0;
             yield return new WaitForFixedUpdate();
         }
     }
     
     public override void ExitState()
     {
-        Debug.Log("Exit State of "+ this.GetType());
         context.StopCoroutine(moveRoutine);
-        //context.MoveEvent?.Invoke(Vector2.zero);
     }
 
     protected Vector2 TargetDistanceVector()
@@ -49,7 +43,7 @@ public class WobbleMoveState<T> : MoveState<T> where T: MonoBehaviour, IMoveCont
     [SerializeField] [Serialize]float amplitude;
     public WobbleMoveState(T currentContext): base(currentContext)
     {
-        frequency = UnityEngine.Random.Range(0.1f, 2f);
+        frequency = UnityEngine.Random.Range(0.1f, 10f);
         amplitude = UnityEngine.Random.Range(0f, 5f);
     }
 
@@ -57,8 +51,6 @@ public class WobbleMoveState<T> : MoveState<T> where T: MonoBehaviour, IMoveCont
     {
         while (true)
         {
-           
-            //context.MoveEvent?.Invoke(_getForce(_getTrackedPosition()).normalized);
             float wobble = Mathf.Sin(Time.time * frequency);
             Vector2 direction = TargetDistanceVector().normalized;
             Vector2 offset = new Vector2(-direction.y,direction.x) * wobble * amplitude;
@@ -66,8 +58,7 @@ public class WobbleMoveState<T> : MoveState<T> where T: MonoBehaviour, IMoveCont
             context.playerRigidbody.AddForce(finalDirection * context.maxSpeed);
             Debug.DrawLine(context.transform.position,context.transform.position + new Vector3(direction.x,direction.y,0));
             Debug.DrawLine(context.transform.position,context.transform.position + new Vector3(offset.x,offset.y,0),Color.blue);
-            float xScale = direction.x < 0 ? -1 : 1;
-            context.transform.localScale = new Vector3(xScale, 1, 1);
+            context.spriteRenderer.flipX = finalDirection.x > 0;
             yield return new WaitForFixedUpdate();
         }
     }
